@@ -6,9 +6,10 @@ interface ChatMessageProps {
   message: string;
   isAi?: boolean;
   isLoading?: boolean;
+  model?: string;
 }
 
-export const ChatMessage = ({ message, isAi, isLoading }: ChatMessageProps) => {
+export const ChatMessage = ({ message, isAi, isLoading, model }: ChatMessageProps) => {
   return (
     <div
       className={cn(
@@ -31,7 +32,12 @@ export const ChatMessage = ({ message, isAi, isLoading }: ChatMessageProps) => {
             <p className="text-sm text-slate-500">AI is thinking...</p>
           </div>
         ) : (
-          <p className="leading-relaxed">{message}</p>
+          <>
+            <p className="leading-relaxed">{message}</p>
+            {isAi && model && (
+              <p className="text-xs text-slate-500">Model: {model}</p>
+            )}
+          </>
         )}
       </div>
     </div>
