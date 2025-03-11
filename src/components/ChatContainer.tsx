@@ -3,6 +3,8 @@ import { useState } from "react";
 import { ChatInput } from "./ChatInput";
 import { ChatMessage } from "./ChatMessage";
 import { ModelSelector } from "./ModelSelector";
+import { generateChatCompletion } from "@/services/api";
+import { toast } from "sonner";
 
 interface Message {
   id: string;
@@ -17,25 +19,39 @@ export const ChatContainer = () => {
   const [selectedModel, setSelectedModel] = useState("gpt-3.5-turbo");
 
   const handleSendMessage = async (message: string) => {
+    // Add user message to chat
     const userMessage = { id: Date.now().toString(), text: message, isAi: false };
     setMessages((prev) => [...prev, userMessage]);
     setIsLoading(true);
 
-    // Simulate AI response - Replace with actual API call
-    setTimeout(() => {
+    try {
+      // Get AI response from our backend service
+      const aiResponse = await generateChatCompletion(
+        message,
+        messages,
+        selectedModel
+      );
+      
+      // Add AI message to chat
       const aiMessage = {
         id: (Date.now() + 1).toString(),
-        text: `This is a simulated AI response from ${selectedModel}. Replace this with actual API integration.`,
+        text: aiResponse,
         isAi: true,
         model: selectedModel,
       };
+      
       setMessages((prev) => [...prev, aiMessage]);
+    } catch (error) {
+      console.error("Error in chat:", error);
+      toast.error("Failed to get a response. Please try again.");
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const handleModelChange = (modelId: string) => {
     setSelectedModel(modelId);
+    toast.info(`Model changed to ${modelId}`);
   };
 
   return (
